@@ -35,8 +35,18 @@ app.get("/notes", (req, res) =>
 //GET request for /api/notes
 app.get("/api/notes", (req, res) => {
   console.info(`${req.method} request received to get notes`);
-  res.json(notes);
+  fs.readFile(path.join(__dirname, "/db/db.json"), "utf-8", (err, data) => {
+    if (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ status: "failure", message: "Error reading notes file" });
+    } else {
+      res.json(JSON.parse(data));
+    }
+  });
 });
+
 
 //POST request for /api/notes
 app.post("/api/notes", (req, res) => {
