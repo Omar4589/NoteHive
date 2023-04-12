@@ -13,7 +13,7 @@ const notes = require("./db/db.json");
 //new instance of express
 const app = express();
 //PORT for listening
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 //add middleware
 app.use(express.json());
