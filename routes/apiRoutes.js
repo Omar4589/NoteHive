@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const notes = require("../db/db.json");
+//const notes = require("../db/db.json");
 const { v4: uuidv4 } = require("uuid");
 const express = require("express");
 const router = express.Router();
@@ -32,25 +32,31 @@ router.post("/notes", (req, res) => {
       title,
       text,
     };
-    //add new note to notes array
-    notes.push(newNote);
-    //create response
-    const response = {
-      status: "success",
-      body: newNote,
-    };
-    //console log success response
-    console.log(response);
-    res.status(201).json(response);
-    //write new note to db.json
-    fs.writeFile(
-      path.join(__dirname, "../db/db.json"),
-      JSON.stringify(notes),
-      (err) =>
-        err
-          ? console.error(err)
-          : console.log(`New note: ${title}, has been written to JSON file`)
-    );
+    fs.readFile(path.join(__dirname, "../db/db.json"), "utf-8", (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json("Error in posting new note");
+        return;
+      }
+
+      const notes = JSON.parse(data);
+      notes.push(newNote);
+
+      fs.writeFile(
+        path.join(__dirname, "../db/db.json"),
+        JSON.stringify(notes),
+        (err) =>
+          err
+            ? console.error(err)
+            : console.log(`New note: ${title}, has been written to JSON file`)
+      );
+      const response = {
+        status: "success",
+        body: newNote,
+      };
+      console.log(response);
+      res.status(201).json(response);
+    });
   } //else return 500 status and return an error
   else {
     res.status(500).json("Error in posting new note");
